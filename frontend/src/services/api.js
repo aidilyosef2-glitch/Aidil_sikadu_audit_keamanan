@@ -27,9 +27,9 @@ export async function apiRequest(endpoint, options = {}) {
     headers['Content-Type'] = 'application/json';
   }
 
-  // Jika di GitHub Pages tanpa backend server, langsung gunakan in-browser simulator
-  const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
-  if (isGitHubPages) {
+  // Jika di GitHub Pages atau Vercel tanpa backend server terpisah, langsung gunakan in-browser simulator
+  const isStaticDeploy = typeof window !== 'undefined' && (window.location.hostname.includes('github.io') || window.location.hostname.includes('vercel.app'));
+  if (isStaticDeploy && !import.meta.env.VITE_API_URL) {
     return handleMockRequest(endpoint, options, headers);
   }
 
