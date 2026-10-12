@@ -1,3 +1,5 @@
+import { handleMockRequest } from './mockApi';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 export const getAuthToken = () => localStorage.getItem('sikadu_token');
@@ -25,21 +27,35 @@ export async function apiRequest(endpoint, options = {}) {
     headers['Content-Type'] = 'application/json';
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers
-  });
-
-  const data = await response.json().catch(() => ({ success: false, message: 'Respon server tidak valid' }));
-
-  if (!response.ok) {
-    const error = new Error(data.message || `HTTP error ${response.status}`);
-    error.status = response.status;
-    error.data = data;
-    throw error;
+  // Jika di GitHub Pages tanpa backend server, langsung gunakan in-browser simulator
+  const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+  if (isGitHubPages) {
+    return handleMockRequest(endpoint, options, headers);
   }
 
-  return data;
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers
+    });
+
+    const data = await response.json().catch(() => ({ success: false, message: 'Respon server tidak valid' }));
+
+    if (!response.ok) {
+      const error = new Error(data.message || `HTTP error ${response.status}`);
+      error.status = response.status;
+      error.data = data;
+      throw error;
+    }
+
+    return data;
+  } catch (err) {
+    // Jika backend lokal tidak aktif atau gagal koneksi, fallback ke simulator
+    if (err.name === 'TypeError' || err.message?.includes('Failed to fetch')) {
+      return handleMockRequest(endpoint, options, headers);
+    }
+    throw err;
+  }
 }
 
 export const api = {
