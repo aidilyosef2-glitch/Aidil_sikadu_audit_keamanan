@@ -60,7 +60,19 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 Handler
+// Sajikan static frontend jika folder dist tersedia (Production Unified Deployment)
+const frontendDist = path.resolve(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api') || req.url.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
+
+// 404 Handler untuk rute API yang tidak ditemukan
 app.use((req, res) => {
   res.status(404).json({
     success: false,

@@ -7,6 +7,8 @@
   "scripts": {
     "init-db": "node database/init-db.js",
     "backend": "cd backend && npm run dev",
-    "frontend": "cd frontend && npm run dev"
+    "frontend": "cd frontend && npm run dev",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build && npm --prefix backend install",
+    "start": "node database/init-db.js && node backend/server.js"
   }
 }
