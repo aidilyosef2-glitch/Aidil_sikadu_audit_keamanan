@@ -1,0 +1,12 @@
+{
+  "name": "sikadu-root",
+  "version": "1.0.0",
+  "description": "SIKADU - Sistem Informasi Kampus Digital (Tugas Audit Keamanan Sistem Informasi M5-M6)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "init-db": "node database/init-db.js",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev"
+  }
+}
